@@ -1,5 +1,6 @@
 <body style="background: white"></body>
-<video id="myVideo" autoplay></video>
+<video id="myVideo" width="640" height="480" autoplay></video>
+<canvas id="myCanvas" width="640" height="480"></canvas>
 <script src="https://unpkg.com/tone"></script>
 <script src="https://algorithmicmusic.online/js/libs/nn.min.js"></script>
 <script src="https://algorithmicmusic.online/js/viz-helpers.js"></script>
@@ -17,9 +18,23 @@
 /* global Tone, nn, viz */
   
 // Hand-Pose Detection Model
+  
+const video = document.getElementById("myVideo")
+const canvas = document.getElementById("myCanvas")
+const ctx = canvas.getContext("2d")
 
 let hand_detector = 0
-let video = 0
+  
+async function setup_webcam(){
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: false
+  })
+  
+  video.srcObject = stream
+  
+  video.play()
+}
   
 async function load_model(){
   const hand_pose_model = handPoseDetection.SupportedModels.MediaPipeHands
@@ -33,24 +48,27 @@ async function load_model(){
   hand_detector = await handPoseDetection.createDetector(hand_pose_model, detectorConfig)
 }
   
-async function setup_webcam(){
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: false
-  })
-  
-  video = document.getElementById("myVideo")
-  
-  video.srcObject = stream
-  
-  video.play()
-}
-  
 async function get_pose(){
   const hand_pose = await hand_detector.estimateHands(video)
   
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  
+  hand_pose.forEach(hand => {
+    hand.keypoints.forEach(keypoint => {
+      ctx.beginPath()
+      ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI)
+      ctx.fillstyle = "blue"
+      ctx.fill()
+      console.log(keypoint.x, keypoint.y)
+      
+      ctx.fillStyle = "white"
+      ctx.font = "10px Arial"
+      ctx.fillText(keypoint.name, keypoint.x + 5, keypoint.y + 5)
+    })
+  })
+  
   if (hand_pose[0]) {
-    console.log(hand_pose[0]["keypoints"])
+    // console.log(hand_pose)
   }
   
   requestAnimationFrame(get_pose)
@@ -66,8 +84,6 @@ async function hand_pose_setup(){
   
 // load_model()
 // setup_webcam()
-
-
   
 
 
