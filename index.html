@@ -17,6 +17,9 @@
 /* global Tone, nn, viz */
   
 // Hand-Pose Detection Model
+
+let hand_detector = 0
+let video = 0
   
 async function load_model(){
   const hand_pose_model = handPoseDetection.SupportedModels.MediaPipeHands
@@ -27,7 +30,7 @@ async function load_model(){
     modelType: "full"
   }
 
-  const hand_detector = await handPoseDetection.createDetector(hand_pose_model, detectorConfig)
+  hand_detector = await handPoseDetection.createDetector(hand_pose_model, detectorConfig)
 }
   
 async function setup_webcam(){
@@ -36,19 +39,33 @@ async function setup_webcam(){
     audio: false
   })
   
-  const video = document.getElementById("myVideo")
+  video = document.getElementById("myVideo")
   
   video.srcObject = stream
   
   video.play()
 }
   
-// async function detect(){
-//   const 
-// }
+async function get_pose(){
+  const hand_pose = await hand_detector.estimateHands(video)
   
-load_model()
-setup_webcam()
+  if (hand_pose[0]) {
+    console.log(hand_pose[0]["keypoints"])
+  }
+  
+  requestAnimationFrame(get_pose)
+}
+  
+async function hand_pose_setup(){
+  await setup_webcam()
+  await load_model()
+  await get_pose()
+}
+
+// hand_pose_setup()
+  
+// load_model()
+// setup_webcam()
 
 
   
