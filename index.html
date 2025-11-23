@@ -1,6 +1,19 @@
 <body style="background: white"></body>
 <video id="myVideo" width="640" height="480" autoplay></video>
 <canvas id="myCanvas" width="640" height="480"></canvas>
+<style>
+  #myVideo, #myCanvas {
+    position: absolute;
+    top: 0;
+    left: 0
+  }
+  #myVideo {
+    z-index: 1
+  }
+  #myCanvas {
+    z-index: 2;
+  }
+</style>
 <script src="https://unpkg.com/tone"></script>
 <script src="https://algorithmicmusic.online/js/libs/nn.min.js"></script>
 <script src="https://algorithmicmusic.online/js/viz-helpers.js"></script>
@@ -57,13 +70,13 @@ async function get_pose(){
     hand.keypoints.forEach(keypoint => {
       ctx.beginPath()
       ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI)
-      ctx.fillstyle = "blue"
+      ctx.fillStyle = "blue"
       ctx.fill()
       console.log(keypoint.x, keypoint.y)
       
-      ctx.fillStyle = "white"
-      ctx.font = "10px Arial"
-      ctx.fillText(keypoint.name, keypoint.x + 5, keypoint.y + 5)
+      // ctx.fillStyle = "white"
+      // ctx.font = "10px Arial"
+      // ctx.fillText(keypoint.name, keypoint.x + 5, keypoint.y + 5)
     })
   })
   
@@ -80,7 +93,7 @@ async function hand_pose_setup(){
   await get_pose()
 }
 
-// hand_pose_setup()
+hand_pose_setup()
   
 // load_model()
 // setup_webcam()
