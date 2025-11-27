@@ -49,6 +49,8 @@ async function setup_webcam(){
   video.play()
 }
   
+
+  
 async function load_model(){
   const hand_pose_model = handPoseDetection.SupportedModels.MediaPipeHands
 
@@ -59,6 +61,71 @@ async function load_model(){
   }
 
   hand_detector = await handPoseDetection.createDetector(hand_pose_model, detectorConfig)
+}
+
+  
+const left_speed_list = []
+const right_speed_list = []
+
+const smoothing_length = 30
+let left_pre_position = 0
+let right_pre_position = 0
+  
+function cal_speed(position, handedness){
+  let instant_speed = 0
+  
+  if (handedness === "Left"){
+    
+    if (left_pre_position !== 0){
+      const dx = position.x - left_pre_position.x
+      const dy = position.y - left_pre_position.y
+
+      instant_speed = Math.sqrt(dx * dx + dy * dy)
+    }
+
+    // console.log(position)
+
+    left_pre_position = {x: position.x, y: position.y}
+    
+    left_speed_list.push(instant_speed)
+  
+    if (left_speed_list.length > smoothing_length){
+      left_speed_list.shift()
+    }
+
+    let speed_sum = 0
+    for (let speed of left_speed_list){
+      speed_sum += speed
+    }
+
+    return speed_sum / left_speed_list.length
+  } else {
+    if (right_pre_position !== 0){
+      const dx = position.x - right_pre_position.x
+      const dy = position.y - right_pre_position.y
+
+      instant_speed = Math.sqrt(dx * dx + dy * dy)
+    }
+
+    // console.log(position)
+
+    right_pre_position = {x: position.x, y: position.y}
+    
+    right_speed_list.push(instant_speed)
+  
+    if (right_speed_list.length > smoothing_length){
+      right_speed_list.shift()
+    }
+
+    let speed_sum = 0
+    for (let speed of right_speed_list){
+      speed_sum += speed
+    }
+
+    return speed_sum / right_speed_list.length
+  }
+  
+  
 }
   
 async function get_pose(){
@@ -72,17 +139,39 @@ async function get_pose(){
       ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI)
       ctx.fillStyle = "blue"
       ctx.fill()
-      console.log(keypoint.x, keypoint.y)
+      // console.log(keypoint.x, keypoint.y)
       
       // ctx.fillStyle = "white"
       // ctx.font = "10px Arial"
       // ctx.fillText(keypoint.name, keypoint.x + 5, keypoint.y + 5)
     })
+    
+    if (hand.handedness === "Left"){
+      const thumb = hand.keypoints[4]
+
+      const smoothed_speed = cal_speed(thumb, "Left")
+
+      ctx.fillStyle = "yellow"
+
+      ctx.font = "20px Arial"
+
+      ctx.fillText(`left hand speed: ${smoothed_speed.toFixed(2)}`, 10, 30)
+    }
+    
+    if (hand.handedness === "Right"){
+      const thumb = hand.keypoints[4]
+
+      const smoothed_speed = cal_speed(thumb, "Right")
+
+      ctx.fillStyle = "yellow"
+
+      ctx.font = "20px Arial"
+
+      ctx.fillText(`right hand speed: ${smoothed_speed.toFixed(2)}`, 320, 30)
+    }
+    
+    
   })
-  
-  if (hand_pose[0]) {
-    // console.log(hand_pose)
-  }
   
   requestAnimationFrame(get_pose)
 }
