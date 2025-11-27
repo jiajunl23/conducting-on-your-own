@@ -150,12 +150,23 @@ async function get_pose(){
       const thumb = hand.keypoints[4]
 
       const smoothed_speed = cal_speed(thumb, "Left")
+      
+      if (smoothed_speed <= 2) {
+        Tone.Transport.bpm.value = 0
+      } else if (smoothed_speed <= 10) {
+        Tone.Transport.bpm.value = 100
+      } else if (smoothed_speed <= 15) {
+        Tone.Transport.bpm.value = 160
+      } else {
+        Tone.Transport.bpm.value = 240
+      }
 
       ctx.fillStyle = "yellow"
 
       ctx.font = "20px Arial"
 
       ctx.fillText(`left hand speed: ${smoothed_speed.toFixed(2)}`, 10, 30)
+      
     }
     
     if (hand.handedness === "Right"){
@@ -216,7 +227,7 @@ drumset.toDestination()
 // TRANSPORT SETUP + OTHER GLOBAL VARS
 // ------------------------------------
 
-Tone.Transport.bpm.value = 240
+Tone.Transport.bpm.value = 220
 Tone.Transport.loop = true
 Tone.Transport.timeSignature = 4
 Tone.Transport.loopEnd = '10m'
@@ -371,12 +382,7 @@ function play (time) {
 
   let chord = nn.createChord(scale, nn.random(possible_chords))
   synth.triggerAttackRelease(chord, length, time)
-  
-  chord.forEach(note => {
-    pressPianoKey(note, length, time)
-  })
 }
-
 
 // SETUP PLAY LOOP
 // ----------------------
@@ -389,11 +395,8 @@ const toggleBtn = nn.create('button')
   .addTo('body')
   .on('click', toggle)
 
-nn.create('br').addTo('body')
+toggle()
 
-const pianoKeys = viz.createPianoUI({
-  labels: true,
-  octaves: [3, 6]
-})
+nn.create('br').addTo('body')
 
 </script>
