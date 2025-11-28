@@ -156,9 +156,9 @@ async function get_pose(){
       } else if (smoothed_speed <= 10) {
         Tone.Transport.bpm.value = 100
       } else if (smoothed_speed <= 15) {
-        Tone.Transport.bpm.value = 160
+        Tone.Transport.bpm.value = 220
       } else {
-        Tone.Transport.bpm.value = 240
+        Tone.Transport.bpm.value = 300
       }
 
       ctx.fillStyle = "yellow"
@@ -179,6 +179,10 @@ async function get_pose(){
       ctx.font = "20px Arial"
 
       ctx.fillText(`right hand speed: ${smoothed_speed.toFixed(2)}`, 320, 30)
+      
+      if (smoothed_speed >= 10) {
+        drumset.player("hihat").start()
+      }
     }
     
     
@@ -227,7 +231,7 @@ drumset.toDestination()
 // TRANSPORT SETUP + OTHER GLOBAL VARS
 // ------------------------------------
 
-Tone.Transport.bpm.value = 220
+Tone.Transport.bpm.value = 50
 Tone.Transport.loop = true
 Tone.Transport.timeSignature = 4
 Tone.Transport.loopEnd = '10m'
@@ -319,22 +323,6 @@ function cal_chance(player, bar, beat){
     }
   }
 }
-
-function toggle () {
-  if (Tone.Transport.state === 'stopped') {
-    Tone.Transport.start()
-    this.content('stop')
-  } else {
-    Tone.Transport.stop()
-    this.content('start')
-  }
-}
-
-function pressPianoKey (note, dur, time) {
-  const delay = time + Tone.Time(dur).toSeconds()
-  Tone.Draw.schedule(() => pianoKeys.attack(note), time)
-  Tone.Draw.schedule(() => pianoKeys.release(note), delay)
-}
   
 let previous_root_index = 0
 
@@ -387,15 +375,8 @@ function play (time) {
 // SETUP PLAY LOOP
 // ----------------------
 new Tone.Loop(play).start()
-
-// USER INTERFACE
-// ---------------------
-const toggleBtn = nn.create('button')
-  .content('start')
-  .addTo('body')
-  .on('click', toggle)
-
-toggle()
+  
+Tone.Transport.start()
 
 nn.create('br').addTo('body')
 
