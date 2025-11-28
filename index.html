@@ -227,7 +227,7 @@ drumset.toDestination()
 // TRANSPORT SETUP + OTHER GLOBAL VARS
 // ------------------------------------
 
-Tone.Transport.bpm.value = 100
+Tone.Transport.bpm.value = 220
 Tone.Transport.loop = true
 Tone.Transport.timeSignature = 4
 Tone.Transport.loopEnd = '10m'
@@ -329,42 +329,14 @@ function toggle () {
     this.content('start')
   }
 }
+
+function pressPianoKey (note, dur, time) {
+  const delay = time + Tone.Time(dur).toSeconds()
+  Tone.Draw.schedule(() => pianoKeys.attack(note), time)
+  Tone.Draw.schedule(() => pianoKeys.release(note), delay)
+}
   
 let previous_root_index = 0
-
-let chords_beat = 0
-
-function play_chords (time){
-  let [root, scale, root_index] = [0, 0, 0]
-  
-  const possible_chords = ["power-chord", "triad", "seventh"]
-  
-  if (chords_beat % 2 === 0){
-    root_index = nn.randomInt(0, 6)
-    root = possible_notes[root_index] + nn.randomInt(4, 5)
-    scale = nn.createScale(root, "major")
-    previous_root_index = root_index
-  } else {
-    root_index = (previous_root_index + 1) % 7
-    root = possible_notes[root_index] + nn.randomInt(4, 5)
-    scale = nn.createScale(root, "major")
-  }
-  
-  
-  let length
-  
-  if (chords_beat < 5){
-    length = nn.random(["16n", "8n"])
-  } else {
-    length = nn.random(["8n", "4n"])
-  }
-        
-
-  let chord = nn.createChord(scale, nn.random(possible_chords))
-  synth.triggerAttackRelease(chord, length, time)
-  
-  chords_beat += 1
-}
 
 function play (time) {
   const [bar, beat] = Tone.Transport.position.split(':').map(Number)
@@ -382,14 +354,39 @@ function play (time) {
       drumset.player(player).start(time + (30 / Tone.Transport.bpm.value))
     }
   }
+  
+  let [root, scale, root_index] = [0, 0, 0]
+  
+  const possible_chords = ["power-chord", "triad", "seventh"]
+  
+  if (beat % 2 === 0){
+    root_index = nn.randomInt(0, 6)
+    root = possible_notes[root_index] + nn.randomInt(4, 5)
+    scale = nn.createScale(root, "major")
+    previous_root_index = root_index
+  } else {
+    root_index = (previous_root_index + 1) % 7
+    root = possible_notes[root_index] + nn.randomInt(4, 5)
+    scale = nn.createScale(root, "major")
+  }
+  
+  
+  let length
+  
+  if (bar < 5){
+    length = nn.random(["16n", "8n"])
+  } else {
+    length = nn.random(["8n", "4n"])
+  }
+        
+
+  let chord = nn.createChord(scale, nn.random(possible_chords))
+  synth.triggerAttackRelease(chord, length, time)
 }
 
 // SETUP PLAY LOOP
 // ----------------------
 new Tone.Loop(play).start()
-
-const chords_loop = new Tone.Loop(play_chords, (60 / 100) + "s")
-chords_loop.start(0)
 
 // USER INTERFACE
 // ---------------------
@@ -398,11 +395,7 @@ const toggleBtn = nn.create('button')
   .addTo('body')
   .on('click', toggle)
 
-
-
-// toggle()
-  
-
+toggle()
 
 nn.create('br').addTo('body')
 
