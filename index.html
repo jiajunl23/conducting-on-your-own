@@ -11,7 +11,7 @@
     z-index: 1
   }
   #myCanvas {
-    z-index: 2;
+    z-index: 2
   }
 </style>
 <script src="https://unpkg.com/tone"></script>
@@ -83,8 +83,6 @@ function cal_speed(position, handedness){
       instant_speed = Math.sqrt(dx * dx + dy * dy)
     }
 
-    // console.log(position)
-
     left_pre_position = {x: position.x, y: position.y}
     
     left_speed_list.push(instant_speed)
@@ -106,8 +104,6 @@ function cal_speed(position, handedness){
 
       instant_speed = Math.sqrt(dx * dx + dy * dy)
     }
-
-    // console.log(position)
 
     right_pre_position = {x: position.x, y: position.y}
     
@@ -167,7 +163,7 @@ async function get_pose(){
 
       ctx.font = "20px Arial"
 
-      ctx.fillText(`left hand speed: ${smoothed_speed.toFixed(2)}`, 10, 30)
+      ctx.fillText(`right thumb speed: ${smoothed_speed.toFixed(2)}`, 10, 30)
       
     }
     
@@ -180,9 +176,9 @@ async function get_pose(){
 
       ctx.font = "20px Arial"
 
-      ctx.fillText(`right hand speed: ${smoothed_speed.toFixed(2)}`, 320, 30)
+      ctx.fillText(`left thumb speed: ${smoothed_speed.toFixed(2)}`, 320, 30)
       
-      if (smoothed_speed >= 5 && frame_passed >= 50) {
+      if (smoothed_speed >= 5 && frame_passed >= 100) {
         drumset.player("hihat").start()
         frame_passed = 0
       }
@@ -251,7 +247,7 @@ function cal_chance(player, bar, beat){
       if (beat % 4 === 0) {
         return nn.random()
       } else {
-        return 0
+        return nn.random(0, 0.55)
       }
     }
   }
@@ -261,7 +257,7 @@ function cal_chance(player, bar, beat){
       if (beat % 4 === 0) {
         return 1
       } else {
-        return 0
+        return nn.random(0, 0.55)
       }
     }
     else {
@@ -274,11 +270,7 @@ function cal_chance(player, bar, beat){
       return 0
     }
     else {
-      if (nn.random() > 0.8){
-        return 0
-      } else{
-        return 0
-      }
+      return nn.random(0, 0.6)
     }
   }
 
@@ -368,9 +360,9 @@ function play (time) {
   } else {
     length = nn.random(["8n", "4n"])
   }
-        
 
   let chord = nn.createChord(scale, nn.random(possible_chords))
+  
   synth.triggerAttackRelease(chord, length, time)
 }
 
@@ -379,7 +371,16 @@ function play (time) {
 new Tone.Loop(play).start()
   
 Tone.Transport.start()
-
-nn.create('br').addTo('body')
+  
+nn.create("button")
+  .content("conducting mode")
+  .css({
+  "position": "absolute",
+  "left": 0,
+  "top": 480,
+  "z-index": 3,
+  "color": "blue"
+})
+  .addTo("body")
 
 </script>
