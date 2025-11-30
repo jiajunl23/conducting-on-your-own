@@ -48,7 +48,7 @@ async function setup_webcam(){
   
   video.play()
 }
-  
+
 
   
 async function load_model(){
@@ -70,6 +70,7 @@ const right_speed_list = []
 const smoothing_length = 30
 let left_pre_position = 0
 let right_pre_position = 0
+let conducting_mode = "off"
   
 function cal_speed(position, handedness){
   let instant_speed = 0
@@ -144,7 +145,7 @@ async function get_pose(){
       // ctx.fillText(keypoint.name, keypoint.x + 5, keypoint.y + 5)
     })
     
-    if (hand.handedness === "Left"){
+    if (hand.handedness === "Left" && conducting_mode === "on"){
       const thumb = hand.keypoints[4]
 
       const smoothed_speed = cal_speed(thumb, "Left")
@@ -167,7 +168,7 @@ async function get_pose(){
       
     }
     
-    if (hand.handedness === "Right"){
+    if (hand.handedness === "Right" && conducting_mode === "on"){
       const thumb = hand.keypoints[4]
 
       const smoothed_speed = cal_speed(thumb, "Right")
@@ -229,7 +230,7 @@ drumset.toDestination()
 // TRANSPORT SETUP + OTHER GLOBAL VARS
 // ------------------------------------
 
-Tone.Transport.bpm.value = 50
+Tone.Transport.bpm.value = 200
 Tone.Transport.loop = true
 Tone.Transport.timeSignature = 4
 Tone.Transport.loopEnd = '10m'
@@ -341,14 +342,23 @@ function play (time) {
   
   const possible_chords = ["power-chord", "triad", "seventh"]
   
-  if (beat % 2 === 0){
+  if (beat % 4 === 0){
     root_index = nn.randomInt(0, 6)
     root = possible_notes[root_index] + nn.randomInt(4, 5)
     scale = nn.createScale(root, "major")
     previous_root_index = root_index
-  } else {
+  } else if (beat % 4 === 1){
     root_index = (previous_root_index + 1) % 7
     root = possible_notes[root_index] + nn.randomInt(4, 5)
+    scale = nn.createScale(root, "major")
+  } else if (beat % 4 === 2){
+    root_index = (previous_root_index + 2) % 7
+    root = possible_notes[root_index] + nn.randomInt(3, 4)
+    scale = nn.createScale(root, "major")
+  }
+  else {
+    root_index = (previous_root_index + 3) % 7
+    root = possible_notes[root_index] + nn.randomInt(3, 4)
     scale = nn.createScale(root, "major")
   }
   
@@ -371,9 +381,21 @@ function play (time) {
 new Tone.Loop(play).start()
   
 Tone.Transport.start()
+
+function change_mode(){
+  if (conducting_mode === "off"){
+    conducting_mode = "on"
+    Tone.Transport.bpm.value = 0
+    this.content("switch to automated mode")
+  } else{
+    conducting_mode = "off"
+    Tone.Transport.bpm.value = 200
+    this.content("switch to conducting mode")
+  }
+}
   
 nn.create("button")
-  .content("conducting mode")
+  .content("switch to conducting mode")
   .css({
   "position": "absolute",
   "left": 0,
@@ -382,5 +404,16 @@ nn.create("button")
   "color": "blue"
 })
   .addTo("body")
+  .on("click", change_mode)
+  
+const input_bpm = nn.create("input")
+                  .addTo("body")
+                  .css({
+                    "position": "absolute",
+                    "left": 200,
+                    "top": 480,
+                    "z-index": 3,
+                    "color": "blue"
+                  })
 
 </script>
