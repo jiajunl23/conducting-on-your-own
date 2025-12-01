@@ -1,11 +1,12 @@
 <body style="background: white"></body>
-<video id="myVideo" width="640" height="480" autoplay></video>
-<canvas id="myCanvas" width="640" height="480"></canvas>
+<video id="myVideo" autoplay></video>
+<canvas id="myCanvas"></canvas>
 <style>
   #myVideo, #myCanvas {
     position: absolute;
-    top: 0;
-    left: 0
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
   }
   #myVideo {
     z-index: 1
@@ -35,6 +36,12 @@
 const video = document.getElementById("myVideo")
 const canvas = document.getElementById("myCanvas")
 const ctx = canvas.getContext("2d")
+
+
+video.style.width = nn.width / 1.2 + "px"
+video.style.height = nn.height / 1.2 + "px"
+canvas.style.width = nn.width / 1.2 + "px"
+canvas.style.height = nn.height / 1.2 + "px"
 
 let hand_detector = 0
   
@@ -398,10 +405,9 @@ nn.create("button")
   .content("switch to conducting mode")
   .css({
   "position": "absolute",
-  "left": 0,
-  "top": 480,
+  "left": 10,
+  "top": 10,
   "z-index": 3,
-  "color": "blue"
 })
   .addTo("body")
   .on("click", change_mode)
@@ -414,8 +420,8 @@ nn.create("label")
   .content("customize the bpm:")
   .css({
         "position": "absolute",
-        "left": 180,
-        "top": 480,
+        "left": 200,
+        "top": 10,
         "z-index": 3,
   })
   .addTo("body")
@@ -424,8 +430,8 @@ const input_bpm = nn.create("input")
                   .addTo("body")
                   .css({
                     "position": "absolute",
-                    "left": 350,
-                    "top": 480,
+                    "left": 380,
+                    "top": 10,
                     "z-index": 3,
                     "color": "blue"
                   })
