@@ -385,9 +385,48 @@ function play (time) {
 
 // SETUP PLAY LOOP
 // ----------------------
-new Tone.Loop(play).start()
   
-Tone.Transport.start()
+function start_playing(){
+  new Tone.Loop(play).start()
+  Tone.Transport.start()
+  
+  nn.create("button")
+    .content("switch to conducting mode")
+    .css({
+    "position": "absolute",
+    "left": 10,
+    "top": 30,
+    "z-index": 3,
+  })
+    .addTo("body")
+    .on("click", change_mode)
+
+  function change_bpm(){
+    Tone.Transport.bpm.value = this.value
+  }
+
+  nn.create("label")
+    .content("customize the bpm:")
+    .css({
+          "position": "absolute",
+          "left": 200,
+          "top": 30,
+          "z-index": 3,
+    })
+    .addTo("body")
+  
+  const input_bpm = nn.create("input")
+                    .addTo("body")
+                    .css({
+                      "position": "absolute",
+                      "left": 380,
+                      "top": 30,
+                      "z-index": 3,
+                      "color": "blue"
+                    })
+                    .on("change", change_bpm)
+}
+
 
 function change_mode(){
   if (conducting_mode === "off"){
@@ -402,7 +441,7 @@ function change_mode(){
 }
   
 nn.create("button")
-  .content("switch to conducting mode")
+  .content("Press this to start playing music")
   .css({
   "position": "absolute",
   "left": 10,
@@ -410,31 +449,6 @@ nn.create("button")
   "z-index": 3,
 })
   .addTo("body")
-  .on("click", change_mode)
-
-function change_bpm(){
-  Tone.Transport.bpm.value = this.value
-}
-
-nn.create("label")
-  .content("customize the bpm:")
-  .css({
-        "position": "absolute",
-        "left": 200,
-        "top": 10,
-        "z-index": 3,
-  })
-  .addTo("body")
-  
-const input_bpm = nn.create("input")
-                  .addTo("body")
-                  .css({
-                    "position": "absolute",
-                    "left": 380,
-                    "top": 10,
-                    "z-index": 3,
-                    "color": "blue"
-                  })
-                  .on("change", change_bpm)
+  .on("click", start_playing)
 
 </script>
