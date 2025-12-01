@@ -352,12 +352,12 @@ function play (time) {
     root = possible_notes[root_index] + nn.randomInt(4, 5)
     scale = nn.createScale(root, "major")
   } else if (beat % 4 === 2){
-    root_index = (previous_root_index + 2) % 7
+    root_index = (previous_root_index + 3) % 7
     root = possible_notes[root_index] + nn.randomInt(3, 4)
     scale = nn.createScale(root, "major")
   }
   else {
-    root_index = (previous_root_index + 3) % 7
+    root_index = (previous_root_index + 2) % 7
     root = possible_notes[root_index] + nn.randomInt(3, 4)
     scale = nn.createScale(root, "major")
   }
@@ -405,15 +405,30 @@ nn.create("button")
 })
   .addTo("body")
   .on("click", change_mode)
+
+function change_bpm(){
+  Tone.Transport.bpm.value = this.value
+}
+
+nn.create("label")
+  .content("customize the bpm:")
+  .css({
+        "position": "absolute",
+        "left": 180,
+        "top": 480,
+        "z-index": 3,
+  })
+  .addTo("body")
   
 const input_bpm = nn.create("input")
                   .addTo("body")
                   .css({
                     "position": "absolute",
-                    "left": 200,
+                    "left": 350,
                     "top": 480,
                     "z-index": 3,
                     "color": "blue"
                   })
+                  .on("change", change_bpm)
 
 </script>
