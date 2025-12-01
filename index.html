@@ -40,8 +40,13 @@ const ctx = canvas.getContext("2d")
 
 video.style.width = nn.width / 1.2 + "px"
 video.style.height = nn.height / 1.2 + "px"
+video.style.objectFit = "fill"
+canvas.width = nn.width / 1.2
+canvas.height = nn.height / 1.2
 canvas.style.width = nn.width / 1.2 + "px"
 canvas.style.height = nn.height / 1.2 + "px"
+  
+
 
 let hand_detector = 0
   
@@ -55,7 +60,13 @@ async function setup_webcam(){
   
   video.play()
 }
+  
+function create_scaling(){
+  scale_x = canvas.width / video.videoWidth
+  scale_y = canvas.height / video.videoHeight
+}
 
+video.addEventListener("loadedmetadata", create_scaling)
 
   
 async function load_model(){
@@ -142,7 +153,7 @@ async function get_pose(){
   hand_pose.forEach(hand => {
     hand.keypoints.forEach(keypoint => {
       ctx.beginPath()
-      ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI)
+      ctx.arc(keypoint.x * scale_x, keypoint.y * scale_y, 5, 0, 2 * Math.PI)
       ctx.fillStyle = "blue"
       ctx.fill()
       // console.log(keypoint.x, keypoint.y)
@@ -171,7 +182,7 @@ async function get_pose(){
 
       ctx.font = "20px Arial"
 
-      ctx.fillText(`right thumb speed: ${smoothed_speed.toFixed(2)}`, 10, 30)
+      ctx.fillText(`right thumb speed: ${smoothed_speed.toFixed(2)}`, 10, 60)
       
     }
     
@@ -184,7 +195,7 @@ async function get_pose(){
 
       ctx.font = "20px Arial"
 
-      ctx.fillText(`left thumb speed: ${smoothed_speed.toFixed(2)}`, 320, 30)
+      ctx.fillText(`left thumb speed: ${smoothed_speed.toFixed(2)}`, 320, 60)
       
       if (smoothed_speed >= 5 && frame_passed >= 100) {
         drumset.player("hihat").start()
