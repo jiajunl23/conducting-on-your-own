@@ -38,14 +38,14 @@ const canvas = document.getElementById("myCanvas")
 const ctx = canvas.getContext("2d")
 
 
-video.style.width = nn.width / 1.2 + "px"
-video.style.height = (nn.width / 1.2) * 3 / 4 + "px"
+video.style.width = nn.width / 1.5 + "px"
+video.style.height = (nn.width / 1.5) * 3 / 4 + "px"
 
 video.style.objectFit = "fill"
-canvas.width = nn.width / 1.2
-canvas.height = (nn.width / 1.2) * 3 / 4
-canvas.style.width = nn.width / 1.2 + "px"
-canvas.style.height = (nn.width / 1.2) * 3 / 4 + "px"
+canvas.width = nn.width / 1.5
+canvas.height = (nn.width / 1.5) * 3 / 4
+canvas.style.width = nn.width / 1.5 + "px"
+canvas.style.height = (nn.width / 1.5) * 3 / 4 + "px"
   
 
 
@@ -203,7 +203,7 @@ async function get_pose(){
 
       ctx.font = "20px Arial"
 
-      ctx.fillText(`left thumb and index finger distance ${cal_dist(thumb, point)}`, canvas.width / 2 , 20)
+      ctx.fillText(`left distance ${cal_dist(thumb, point).toFixed(2)}`, canvas.width / 2 , 20)
       
       if (cal_dist(thumb, point) <= 30 && frame_passed >= 50) {
         drumset.player("hihat").start()
@@ -511,6 +511,7 @@ const instructions = nn.create("label")
                       "left": 0,
                       "top": nn.height - 100,
                       "z-index": 4,
+                      "color": "red"
                     })
                       .addTo("body")
 
