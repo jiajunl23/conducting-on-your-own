@@ -203,7 +203,7 @@ async function get_pose(){
 
       ctx.font = "20px Arial"
 
-      ctx.fillText(`left thumb speed: ${cal_dist(thumb, point)}`, canvas.width / 2 , 20)
+      ctx.fillText(`left thumb and index finger distance ${cal_dist(thumb, point)}`, canvas.width / 2 , 20)
       
       if (cal_dist(thumb, point) <= 30 && frame_passed >= 50) {
         drumset.player("hihat").start()
@@ -491,7 +491,7 @@ function change_mode(){
 }
   
 nn.create("button")
-  .content("Press this to start playing music and explore conducting music on your own")
+  .content("Start playing music and explore conducting music on your own")
   .css({
   "position": "absolute",
   "left": 10,
@@ -500,5 +500,45 @@ nn.create("button")
 })
   .addTo("body")
   .on("click", start_playing)
+
+  
+let instrustions_on = false
+
+const instructions = nn.create("label")
+                      .content(" ")
+                      .css({
+                      "position": "absolute",
+                      "left": 0,
+                      "top": nn.height - 100,
+                      "z-index": 4,
+                    })
+                      .addTo("body")
+
+function instructions_mode(){
+  if (instrustions_on){
+    instructions.content(" ")
+    instrustions_on = false
+    this.content("Open Instructions")
+  }
+  else{
+    instructions.content("When in conducting mode, use your right hand thumb movement speed to control speed of music and put together your left hand's thumb and index finger to hit a hihat.")
+    instrustions_on = true
+    this.content("Close Instructions")
+  }
+}
+  
+nn.create("button")
+  .content("Open Instructions")
+  .css({
+  "position": "absolute",
+  "left": 500,
+  "top": 10,
+  "z-index": 3,
+})
+  .addTo("body")
+  .on("click", instructions_mode)
+
+
+  
 
 </script>
